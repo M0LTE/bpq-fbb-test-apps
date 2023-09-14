@@ -10,6 +10,8 @@ internal class Program
         var tcpListener = new TcpListener(IPAddress.Loopback, 63001);
         tcpListener.Start();
 
+        List<char> buffer = new();
+
         while (true)
         {
             Console.WriteLine("Listening...");
@@ -46,9 +48,33 @@ internal class Program
                 string output = $"0x{formatted}  {c:000}  {GetPrintable(c)}";
 
                 Console.WriteLine(output);
-                writer.Write(output);
+                writer.WriteLine(output);
+
+                buffer.Add((char)c);
+                if (EndsWith(buffer, "/bye"))
+                {
+                    writer.WriteLine("Bye!");
+                    Console.WriteLine("Client said bye");
+                    break;
+                }
+                if (buffer.Count > 10)
+                {
+                    buffer.RemoveAt(0);
+                }
             }
         }
+    }
+
+    private static bool EndsWith(List<char> buffer, string value)
+    {
+        string s = new(buffer.ToArray());
+
+        if (s.EndsWith(value))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private static string GetPrintable(int c) => c switch
