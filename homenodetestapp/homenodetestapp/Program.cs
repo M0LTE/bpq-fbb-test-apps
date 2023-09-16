@@ -33,14 +33,42 @@ internal class Program
 
         await streamWriter.WriteAsync($"{bpqUser}\r{bpqPassword}\rBPQTERMTCP\r");
         streamReader.WaitToReceive("Connected to TelnetServer\r");
-        await streamWriter.WriteAsync("C farapp\r");
+        await streamWriter.WriteAsync("C a0bbb-8\r");
 
         // from the near node
         ReceiveLineToConsole(streamReader);
 
         // from the far node
         ReceiveLineToConsole(streamReader);
-        
+
+        while (true)
+        {
+            Console.WriteLine("Enter a number of bytes to send");
+            var input = Console.ReadLine();
+
+            if (input == "q")
+            {
+                break;
+            }
+
+            if (!int.TryParse(input, out var b))
+            {
+                Console.WriteLine("Invalid number");
+                continue;
+            }
+
+            var buffer = new byte[b];
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = (byte)'a';
+            }
+
+            buffer[buffer.Length - 1] = (byte)'z';
+
+            stream.Write(buffer, 0, buffer.Length);
+        }
+
+        /*
         Console.WriteLine("Enter a decimal number to send that byte to the far end");
         while (true)
         {
@@ -58,7 +86,7 @@ internal class Program
             }
 
             stream.Write(new[] { b }, 0, 1);
-        }
+        }*/
 
         /*for (byte b = 0; b <= 255; b++)
         {
